@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,8 +25,10 @@ public class MenuItemController {
         try {
             List<Role> roleList = new ArrayList<>(user.getRoles());
 
+            Arrays.sort(new List[]{roleList});
             List<MenuItem> menuItemList = new ArrayList<>();
             for (Role role : roleList) {
+                Arrays.sort(new List[]{role.getMenu()});
                 for (MenuItem menu : role.getMenu()) {
                     if(!menuItemList.contains(menu)) {
                         menuItemList.add(menu);
