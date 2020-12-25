@@ -18,17 +18,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/menu")
 public class MenuItemController {
-    private final MenuItemRepository menuRepo;
-
-    public MenuItemController(MenuItemRepository menuRepo) {
-        this.menuRepo = menuRepo;
-    }
 
     @GetMapping
     public HttpEntity<?> getMenu(@CurrentUser User user) {
         try {
             List<Role> roleList = new ArrayList<>(user.getRoles());
-            return ResponseEntity.ok(new ApiResponse("Menu", true, roleList.get(0).getMenu()));
+
+            List<MenuItem> menuItemList = new ArrayList<>();
+            for (Role role : roleList) {
+                menuItemList.addAll(role.getMenu());
+            }
+            return ResponseEntity.ok(new ApiResponse("Menu", true, menuItemList));
         } catch (NullPointerException e) {
             return ResponseEntity.ok(new ApiResponse("Menu not found", false));
         }

@@ -37,6 +37,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse("Error", false));
     }
 
+    // havsizligi qilinmagan
     @GetMapping
     public HttpEntity<?> getAll() {
         ApiResponse apiResponse = userService.getAllUsers();
