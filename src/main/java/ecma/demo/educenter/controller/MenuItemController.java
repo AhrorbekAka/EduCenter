@@ -26,7 +26,11 @@ public class MenuItemController {
 
             List<MenuItem> menuItemList = new ArrayList<>();
             for (Role role : roleList) {
-                menuItemList.addAll(role.getMenu());
+                for (MenuItem menu : role.getMenu()) {
+                    if(!menuItemList.contains(menu)) {
+                        menuItemList.add(menu);
+                    }
+                }
             }
             return ResponseEntity.ok(new ApiResponse("Menu", true, menuItemList));
         } catch (NullPointerException e) {
