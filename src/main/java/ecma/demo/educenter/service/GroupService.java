@@ -57,18 +57,26 @@ public class GroupService {
     }
 
     public ApiResponse getGroupsForCurrentUser(User user, int page, boolean present) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("name"));
-        for (Role role : user.getRoles()) {
-            if(role.getName() == RoleName.DIRECTOR || role.getName() == RoleName.ADMIN){
-                return new ApiResponse("All groups", true, groupRepository.findAllByIsPresentOrderByName(present));
+        try {
+            Pageable pageable = PageRequest.of(page, 10, Sort.by("name"));
+            for (Role role : user.getRoles()) {
+                if (role.getName() == RoleName.DIRECTOR || role.getName() == RoleName.ADMIN) {
+                    return new ApiResponse("All groups", true, groupRepository.findAllByIsPresentOrderByName(present));
+                }
             }
-        }
-        return getGroupsByTeacher(user.getId(), pageable);
+            return getGroupsByTeacher(user.getId(), pageable);
 //        return new ApiResponse("Groups for current user", true, groupRepository.findAllByTeacherId(user.getId(), present, pageable));
+        } catch (Exception e) {
+            return new ApiResponse("Error can't find group", false);
+        }
     }
 
     public ApiResponse getGroupsByTeacher(UUID teacherId, Pageable pageable) {
-        return new ApiResponse("Groups by teacher", true, groupRepository.findAllByTeacherId(teacherId, true, pageable));
+        try {
+            return new ApiResponse("Groups by teacher", true, groupRepository.findAllByTeacherId(teacherId, true, pageable));
+        } catch (Exception e) {
+            return new ApiResponse("Error groups not found", false);
+        }
     }
 
     public ApiResponse edit(ReqGroup reqGroup) {

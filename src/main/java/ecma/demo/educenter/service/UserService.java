@@ -49,14 +49,18 @@ public class UserService {
 
 
     public ApiResponse disableUser(UUID id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isPresent()){
-            User user = optionalUser.get();
-            user.setEnabled(false);
-            userRepository.save(user);
-            return new ApiResponse("User disabled", true);
+        try {
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setEnabled(false);
+                userRepository.save(user);
+                return new ApiResponse("User disabled", true);
+            }
+            return new ApiResponse("Error user not found!!!", false);
+        } catch (Exception e) {
+            return new ApiResponse("Error user not found!!!", false);
         }
-        return new ApiResponse("Error user not found!!!", false);
     }
 
     public ApiResponse delete(UUID id) {

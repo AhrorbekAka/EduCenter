@@ -44,15 +44,9 @@ public class UserController {
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
     }
 
-//    @GetMapping
-//    public HttpEntity<?> getAll(@CurrentUser User currentUser) {
-//        ApiResponse apiResponse = userService.getAllUsers();
-//        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
-//    }
-
     @PatchMapping("/disable")
-    public HttpEntity<?> disableUser(@RequestParam UUID id) {
-        ApiResponse apiResponse = userService.disableUser(id);
+    public HttpEntity<?> disableUser(@RequestParam UUID userId) {
+        ApiResponse apiResponse = userService.disableUser(userId);
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);    }
 
 }

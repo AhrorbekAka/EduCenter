@@ -20,26 +20,11 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final AuthService authService;
 
-    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, AuthService authService) {
+    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
-        this.authService = authService;
     }
-//
-//    @PostMapping("/register")
-//    public HttpEntity<?> register(@Valid @RequestBody ReqSignUp reqSignUp) {
-//        ApiResponse response = authService.register(reqSignUp);
-//        if (response.isSuccess()) {
-//            return ResponseEntity
-//                    .status(HttpStatus.CREATED)
-//                    .body(getApiToken(reqSignUp.getPhoneNumber(), reqSignUp.getPassword()));
-//        }
-//        return ResponseEntity
-//                .status(HttpStatus.CONFLICT)
-//                .body(response.getMessage());
-//    }
 
     @PostMapping("/login")
     public HttpEntity<?> authenticateUser(@RequestBody ReqSignIn reqSignIn) {

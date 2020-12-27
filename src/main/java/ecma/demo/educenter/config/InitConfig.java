@@ -14,8 +14,8 @@ public class InitConfig {
             if (props.getProperty("spring.jpa.hibernate.ddl-auto").equals("update")){
                 return true;
             }else{
-                String confirm = JOptionPane.showInputDialog("Ma'lumotlarni o'chirib yuborma! Keyin bilmay qoldim dema! Agar rostdan ham o'chirmoqchi bo'lsang. O'chirish kodi (DROP_PDP_DATABASE) :");
-                if (confirm!=null && confirm.equals("DROP_PDP_DATABASE")){
+                String confirm = JOptionPane.showInputDialog("Ma'lumotlarni o'chirib yuborma! Keyin bilmay qoldim dema! Agar rostdan ham o'chirmoqchi bo'lsang. O'chirish kodi (DROP_EDU_CENTER_DATABASE) :");
+                if (confirm!=null && confirm.equals("DROP_EDU_CENTER_DATABASE")){
                     return true;
                 }
             }

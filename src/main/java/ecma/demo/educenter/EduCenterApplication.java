@@ -20,6 +20,7 @@ public class EduCenterApplication implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository;
+
     @Override
     public void run(String... args) throws Exception {
 //        this.userRepository.save(new User("asdf", "Abror", "Nematov", "+998955155885", new HashSet<>()));

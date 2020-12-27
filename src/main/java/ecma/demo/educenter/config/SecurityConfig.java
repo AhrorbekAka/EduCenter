@@ -1,11 +1,13 @@
 package ecma.demo.educenter.config;
 
 
+import ecma.demo.educenter.entity.enums.RoleName;
 import ecma.demo.educenter.security.AuthService;
 import ecma.demo.educenter.security.JwtAuthenticationEntryPoint;
 import ecma.demo.educenter.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -98,21 +100,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/csrf",
                         "/webjars/**")
                 .permitAll()
-                .antMatchers("/api/**").permitAll()
-//                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-//                .antMatchers(HttpMethod.GET, ).permitAll()
-//                .antMatchers(HttpMethod.POST, "/api/group/", "/api/student/").hasAnyRole("ADMIN", "DIRECTOR","TEACHER")
-//                .antMatchers(HttpMethod.GET, "/api/group", "/api/student", "/api/student/by-group", "/api/student/search", "/api/user/me", "/api/subject").hasAnyRole("ADMIN", "DIRECTOR","TEACHER")
-//                .antMatchers(HttpMethod.PATCH, "/api/group", "/api/group/closeOrReopen", "/api/user/disable").hasAnyRole("ADMIN", "DIRECTOR")
-//                .antMatchers(HttpMethod.POST, "/api/auth/register", "/api/user").hasAnyRole("ADMIN", "DIRECTOR")
-//                .antMatchers(HttpMethod.GET, "/api/user", "/api/user").hasAnyRole("ADMIN", "DIRECTOR")
-//                .antMatchers(HttpMethod.PATCH, "/api/student").hasAnyRole("ADMIN", "DIRECTOR", "TEACHER")
-//                .antMatchers(HttpMethod.GET, "/api/user").hasRole("ADMIN")
-//                .antMatchers(HttpMethod.POST, "/api/user").hasAnyRole("ADMIN")
-//                .antMatchers(HttpMethod.PUT, "/api/user").hasRole("ADMIN")
-//                .antMatchers(HttpMethod.PATCH, "/api/user").hasRole("ADMIN")
-//                .antMatchers(HttpMethod.DELETE, "/api/user").hasRole("ADMIN")
-//                .antMatchers("/api/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/groups").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.GET, "/api/groups", "/api/menu").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.GET, "/api/groups/teacher").hasAuthority("DIRECTOR")
+                .antMatchers(HttpMethod.PATCH, "/api/groups", "/api/groups/closeOrReopen").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.POST, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.GET, "/api/student", "/api/student/search").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PATCH, "/api/student/payment").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.DELETE, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.GET, "/api/subject").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.POST, "/api/user").hasAuthority("DIRECTOR")
+                .antMatchers(HttpMethod.GET, "/api/user/me").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.GET, "/api/user").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PATCH, "/api/user/disable").hasAuthority("DIRECTOR")
                 .anyRequest().authenticated();
 
 //         Add our custom JWT security filter
