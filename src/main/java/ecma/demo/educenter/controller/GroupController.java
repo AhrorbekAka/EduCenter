@@ -26,7 +26,7 @@ public class    GroupController {
 
     @PostMapping
     public HttpEntity<?> save(@RequestBody ReqGroup reqGroup) {
-        ApiResponse apiResponse = groupService.save(reqGroup);
+        ApiResponse apiResponse = groupService.saveOrEdit(reqGroup);
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.CREATED: HttpStatus.CONFLICT).body(apiResponse);
     }
 
@@ -39,12 +39,6 @@ public class    GroupController {
     @GetMapping("teacher")
     public HttpEntity<?> getGroupsByTeacher(@RequestParam UUID teacherId, @RequestParam(defaultValue = "0") Integer page) {
         ApiResponse apiResponse = groupService.getGroupsByTeacher(teacherId, PageRequest.of(page, 10, Sort.by("name"))  );
-        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
-    }
-
-    @PatchMapping
-    public HttpEntity<?> edit(@RequestBody ReqGroup reqGroup) {
-        ApiResponse apiResponse = groupService.edit(reqGroup);
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
     }
 

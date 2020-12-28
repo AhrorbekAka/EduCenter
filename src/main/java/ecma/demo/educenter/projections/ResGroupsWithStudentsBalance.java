@@ -1,5 +1,7 @@
 package ecma.demo.educenter.projections;
 
+import ecma.demo.educenter.entity.Subject;
+import ecma.demo.educenter.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,9 +12,14 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ResGroupsWithStudentsBalance {
 
-    UUID id;
-    String name;
+    private UUID id;
+    private String name;
 
-    List<ResStudentWithBalance> students;
+    private List<ResStudentWithBalance> students;
+
+    private double payment;
+    private List<User> teachers;
+    private Subject subject;
+    private String description;
 
 }

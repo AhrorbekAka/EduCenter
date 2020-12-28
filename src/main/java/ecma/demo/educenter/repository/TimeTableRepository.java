@@ -23,5 +23,8 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, UUID> {
             "  LIMIT 1")
     double findPaymentAmountByMonthAndGroupId(UUID groupId);
 
+    @Query(nativeQuery = true, value = "SELECT tt.* FROM time_table tt join groups_time_tables gtt on tt.id = gtt.time_tables_id WHERE gtt.groups_id = :groupId ORDER BY tt.created_at DESC LIMIT 1")
+    TimeTable findLastByGroupId(UUID groupId);
+
 
 }

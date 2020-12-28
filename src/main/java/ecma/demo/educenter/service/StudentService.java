@@ -3,9 +3,9 @@ package ecma.demo.educenter.service;
 import ecma.demo.educenter.entity.Group;
 import ecma.demo.educenter.entity.Payment;
 import ecma.demo.educenter.entity.Student;
+import ecma.demo.educenter.entity.TimeTable;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqStudent;
-import ecma.demo.educenter.projections.ResGroupWithStudentBalance;
 import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
 import ecma.demo.educenter.repository.GroupRepository;
@@ -17,10 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class StudentService {
@@ -72,13 +69,22 @@ public class StudentService {
 
             List<ResGroupsWithStudentsBalance> resGroupList = new ArrayList<>();
             for (Group group : groupList) {
+                group.getTimeTables().sort(Comparator.comparing(TimeTable::getCreatedAt));
                 List<ResStudentWithBalance> resStudents = studentRepository.findAllWithBalanceByGroupIdAndIsStudyingNow(group.getId(), isStudying);
-                resGroupList.add(new ResGroupsWithStudentsBalance(group.getId(), group.getName(), resStudents));
+                resGroupList.add(new ResGroupsWithStudentsBalance(
+                        group.getId(),
+                        group.getName(),
+                        resStudents,
+                        group.getTimeTables().get(0).getPaymentForThisMonth(),
+                        group.getTeachers(),
+                        group.getSubject(),
+                        group.getDescription()
+                        ));
             }
 
             return new ApiResponse("All Groups With Student Balance", true, resGroupList);
         }  catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return new ApiResponse("Error", false);
         }
     }
