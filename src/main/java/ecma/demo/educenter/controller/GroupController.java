@@ -36,6 +36,12 @@ public class    GroupController {
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
     }
 
+    @GetMapping("/with-s-balance")
+    public HttpEntity<?> getAllWithStudentBalance(@RequestParam(required = false, defaultValue = "true") Boolean isPresent) {
+        ApiResponse apiResponse = groupService.getAllWithStudentBalance(isPresent);
+        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
+    }
+
     @GetMapping("teacher")
     public HttpEntity<?> getGroupsByTeacher(@RequestParam UUID teacherId, @RequestParam(defaultValue = "0") Integer page) {
         ApiResponse apiResponse = groupService.getGroupsByTeacher(teacherId, PageRequest.of(page, 10, Sort.by("name"))  );

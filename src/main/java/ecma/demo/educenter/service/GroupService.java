@@ -1,14 +1,12 @@
 package ecma.demo.educenter.service;
 
 import ecma.demo.educenter.entity.*;
-import ecma.demo.educenter.entity.enums.RoleName;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqGroup;
-import ecma.demo.educenter.repository.GroupRepository;
-import ecma.demo.educenter.repository.SubjectRepository;
-import ecma.demo.educenter.repository.TimeTableRepository;
-import ecma.demo.educenter.repository.UserRepository;
+import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
+import ecma.demo.educenter.projections.ResStudentWithBalance;
+import ecma.demo.educenter.repository.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,12 +21,14 @@ public class GroupService {
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final TimeTableRepository timeTableRepository;
+    private final StudentRepository studentRepository;
 
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository, StudentRepository studentRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.timeTableRepository = timeTableRepository;
+        this.studentRepository = studentRepository;
     }
 
     public ApiResponse saveOrEdit(ReqGroup reqGroup) {
@@ -106,15 +106,41 @@ public class GroupService {
     public ApiResponse getGroupsForCurrentUser(User user, int page, boolean present) {
         try {
             Pageable pageable = PageRequest.of(page, 10, Sort.by("name"));
-            for (Role role : user.getRoles()) {
-                if (role.getName() == RoleName.DIRECTOR || role.getName() == RoleName.ADMIN) {
-                    return new ApiResponse("All groups", true, groupRepository.findAllByIsPresentOrderByName(present));
-                }
-            }
+//            for (Role role : user.getRoles()) {
+//                if (role.getName() == RoleName.DIRECTOR || role.getName() == RoleName.ADMIN) {
+//                    return new ApiResponse("All groups", true, groupRepository.findAllByIsPresentOrderByName(present));
+//                }
+//            }
             return getGroupsByTeacher(user.getId(), pageable);
 //        return new ApiResponse("Groups for current user", true, groupRepository.findAllByTeacherId(user.getId(), present, pageable));
         } catch (Exception e) {
             return new ApiResponse("Error can't find group", false);
+        }
+    }
+
+    public ApiResponse getAllWithStudentBalance(Boolean isPresent) {
+        try {
+            List<Group> groupList = groupRepository.findAllByIsPresentOrderByName(isPresent);
+
+            List<ResGroupsWithStudentsBalance> resGroupList = new ArrayList<>();
+            for (Group group : groupList) {
+                group.getTimeTables().sort(Comparator.comparing(TimeTable::getCreatedAt));
+                List<ResStudentWithBalance> resStudents = studentRepository.findAllWithBalanceByGroupIdAndIsStudyingNow(group.getId(), true);
+                resGroupList.add(new ResGroupsWithStudentsBalance(
+                        group.getId(),
+                        group.getName(),
+                        resStudents,
+                        group.getTimeTables().get(0).getPaymentForThisMonth(),
+                        group.getTeachers(),
+                        group.getSubject(),
+                        group.getDescription()
+                ));
+            }
+
+            return new ApiResponse("All Groups With Student Balance", true, resGroupList);
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse("Error", false);
         }
     }
 

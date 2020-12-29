@@ -103,6 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/groups").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/groups", "/api/menu").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.GET, "/api/groups/with-s-balance").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/groups/teacher").hasAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.PATCH, "/api/groups", "/api/groups/closeOrReopen").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.POST, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
@@ -114,6 +115,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/user/me").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.GET, "/api/user").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.PATCH, "/api/user/disable").hasAuthority("DIRECTOR")
+                .antMatchers(HttpMethod.PATCH, "/api/auth/changePassword").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .anyRequest().authenticated();
 
 //         Add our custom JWT security filter

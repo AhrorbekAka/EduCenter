@@ -28,38 +28,49 @@ public class UserService {
     }
 
     public ApiResponse save(ReqUser reqUser) {
-        User user = new User();
-        if (reqUser.getId() != null) {
-            Optional<User> optionalUser = userRepository.findById(reqUser.getId());
-            if(optionalUser.isPresent()) user = optionalUser.get();
-        } else {
-            user.setPassword(passwordEncoder.encode(reqUser.getFirstName() + 123));
-            user.setRoles(roleRepository.findAllByName(RoleName.TEACHER));
-        }
-        user.setFirstName(reqUser.getFirstName());
-        user.setLastName(reqUser.getLastName());
-        user.setPhoneNumber(reqUser.getPhoneNumber());
-        userRepository.save(user);
-        return new ApiResponse("User successfully saved", true);
-    }
-
-    public ApiResponse getAllUsers() {
-        return new ApiResponse("All users", true, userRepository.findAllByEnabledOrderByFirstName(true));
-    }
-
-
-    public ApiResponse disableUser(UUID id) {
         try {
-            Optional<User> optionalUser = userRepository.findById(id);
+            User user = new User();
+            if (reqUser.getId() != null) {
+                Optional<User> optionalUser = userRepository.findById(reqUser.getId());
+                if (optionalUser.isPresent()) user = optionalUser.get();
+            } else {
+                user.setPassword(passwordEncoder.encode(reqUser.getFirstName() + 123));
+                user.setRoles(roleRepository.findAllByName(RoleName.TEACHER));
+            }
+            user.setFirstName(reqUser.getFirstName());
+            user.setLastName(reqUser.getLastName());
+            user.setPhoneNumber(reqUser.getPhoneNumber());
+            userRepository.save(user);
+            return new ApiResponse("User successfully saved", true);
+        } catch (Exception e) {
+            return new ApiResponse("Error", false);
+        }
+    }
+
+    public ApiResponse getAllEnabledUsers(boolean isEnabled) {
+        try {
+            return new ApiResponse("All users", true, userRepository.findAllByEnabledOrderByFirstName(isEnabled));
+        } catch (Exception e) {
+            return new ApiResponse("Error", false);
+        }
+    }
+
+
+    public ApiResponse disableEnableUser(UUID userId) {
+        try {
+            Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                user.setEnabled(false);
+                if (user.getRoles().contains(roleRepository.findByName(RoleName.DIRECTOR))) {
+                    return new ApiResponse("Mr. Director can not be disabled", false);
+                }
+                user.setEnabled(!user.isEnabled());
                 userRepository.save(user);
-                return new ApiResponse("User disabled", true);
+                return new ApiResponse("User isEnabled changed", true);
             }
-            return new ApiResponse("Error user not found!!!", false);
+            return new ApiResponse("Error user not found ! ! !", false);
         } catch (Exception e) {
-            return new ApiResponse("Error user not found!!!", false);
+            return new ApiResponse("Error ! ! !", false);
         }
     }
 
@@ -67,8 +78,17 @@ public class UserService {
         try {
             userRepository.deleteById(id);
             return new ApiResponse("User deleted", true);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ApiResponse("Error user could be deleted!!!", false);
+        }
+    }
+
+    public void changePassword(User currentUser, String newPassword) {
+        try {
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(currentUser);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

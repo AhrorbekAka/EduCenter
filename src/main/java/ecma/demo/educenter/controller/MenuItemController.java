@@ -13,29 +13,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/menu")
 public class MenuItemController {
 
+    private final MenuItemRepository menuRepository;
+
+    public MenuItemController(MenuItemRepository menuRepository) {
+        this.menuRepository = menuRepository;
+    }
+
     @GetMapping
     public HttpEntity<?> getMenu(@CurrentUser User user) {
         try {
-            List<Role> roleList = new ArrayList<>(user.getRoles());
-
-            Arrays.sort(new List[]{roleList});
-            List<MenuItem> menuItemList = new ArrayList<>();
-            for (Role role : roleList) {
-                Arrays.sort(new List[]{role.getMenu()});
-                for (MenuItem menu : role.getMenu()) {
-                    if(!menuItemList.contains(menu)) {
-                        menuItemList.add(menu);
-                    }
-                }
-            }
-            return ResponseEntity.ok(new ApiResponse("Menu", true, menuItemList));
+            Role role = (Role) user.getRoles().toArray()[0];
+            return ResponseEntity.ok(new ApiResponse("Menu", true, role.getMenu()));
         } catch (NullPointerException e) {
             return ResponseEntity.ok(new ApiResponse("Menu not found", false));
         }

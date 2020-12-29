@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,14 +40,14 @@ public class UserController {
 
     // havsizligi qilinmagan
     @GetMapping
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = userService.getAllUsers();
-        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
+    public HttpEntity<?> getAllEnabledUsers(@RequestParam(required = false, defaultValue = "true") Boolean isEnabled) {
+        ApiResponse apiResponse = userService.getAllEnabledUsers(isEnabled);
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PatchMapping("/disable")
-    public HttpEntity<?> disableUser(@RequestParam UUID userId) {
-        ApiResponse apiResponse = userService.disableUser(userId);
-        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);    }
-
+    public HttpEntity<?> disableEnableUser(@RequestParam UUID userId) {
+        ApiResponse apiResponse = userService.disableEnableUser(userId);
+        return ResponseEntity.ok(apiResponse);
+    }
 }

@@ -12,5 +12,7 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
 
     Set<Role> findAllByName(RoleName roleName);
 
+    Role findByName(RoleName name);
+
 }
 
