@@ -17,6 +17,10 @@ public class ReqUser {
 
     private String lastName;
 
+    private String roleName;
+
     private String phoneNumber;
+
+    private String password;
 
 }

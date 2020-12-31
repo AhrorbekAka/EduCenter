@@ -33,10 +33,19 @@ public class UserService {
             if (reqUser.getId() != null) {
                 Optional<User> optionalUser = userRepository.findById(reqUser.getId());
                 if (optionalUser.isPresent()) user = optionalUser.get();
+                if (reqUser.getPassword().length() > 0) user.setPassword(passwordEncoder.encode(reqUser.getPassword()));
             } else {
-                user.setPassword(passwordEncoder.encode(reqUser.getFirstName() + 123));
-                user.setRoles(roleRepository.findAllByName(RoleName.TEACHER));
+                if (reqUser.getPassword().length() == 0) {
+                    user.setPassword(passwordEncoder.encode(reqUser.getFirstName() + 123 + '#'));
+                } else {
+                    user.setPassword(passwordEncoder.encode(reqUser.getPassword()));
+                }
             }
+            if (reqUser.getRoleName().equals(String.valueOf(RoleName.DIRECTOR))) {
+                return new ApiResponse("No one can save DIRECTOR", false);
+            }
+            user.setRoles(roleRepository.findAllByName(RoleName.valueOf(reqUser.getRoleName())));
+
             user.setFirstName(reqUser.getFirstName());
             user.setLastName(reqUser.getLastName());
             user.setPhoneNumber(reqUser.getPhoneNumber());

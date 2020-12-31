@@ -1,9 +1,6 @@
 package ecma.demo.educenter.service;
 
-import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Payment;
-import ecma.demo.educenter.entity.Student;
-import ecma.demo.educenter.entity.TimeTable;
+import ecma.demo.educenter.entity.*;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqStudent;
 import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
@@ -14,6 +11,7 @@ import ecma.demo.educenter.repository.StudentRepository;
 import ecma.demo.educenter.repository.TimeTableRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
