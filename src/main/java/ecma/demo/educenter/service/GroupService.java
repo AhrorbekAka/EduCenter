@@ -103,7 +103,7 @@ public class GroupService {
         }
     }
 
-    public ApiResponse getGroupsForCurrentUser(User user, int page, boolean present) {
+    public ApiResponse  getGroupsForCurrentUser(User user, int page, boolean present) {
         try {
             Pageable pageable = PageRequest.of(page, 10, Sort.by("name"));
 //            for (Role role : user.getRoles()) {

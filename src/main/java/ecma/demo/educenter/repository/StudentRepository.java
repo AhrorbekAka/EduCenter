@@ -1,7 +1,6 @@
 package ecma.demo.educenter.repository;
 
 import ecma.demo.educenter.entity.Student;
-import ecma.demo.educenter.payload.ReqStudent;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +14,6 @@ import java.util.UUID;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, UUID> {
-
-    List<Student> findAllByIsStudyingNowOrderByLastName(Boolean isStudying);
 
     @Query(value = "SELECT * FROM student WHERE lower(first_name) LIKE concat('%', lower(:search),'%') OR lower(last_name) LIKE concat('%',lower(:search),'%') OR phone_number LIKE concat('%', :search, '%') OR parents_number LIKE concat('%', :search, '%') ", nativeQuery = true)
     Page<Student> findAllSearchedStudentsOrderByLastName(String search, Pageable pageable);
@@ -41,6 +38,12 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
             "FROM student s JOIN groups_students gs ON s.id = gs.students_id " +
             "WHERE gs.groups_id = :groupId AND s.is_studying_now = :isStudying ORDER BY s.last_name")
     List<ResStudentWithBalance> findAllWithBalanceByGroupIdAndIsStudyingNow(UUID groupId, Boolean isStudying);
+
+    @Query(nativeQuery = true, value = "DELETE FROM groups_students WHERE students_id = :studentId AND groups_id = :groupId")
+    void deleteFromGroupById(UUID studentId, UUID groupId);
+
+    @Query(nativeQuery = true, value = "SELECT count(*) FROM groups_students WHERE students_id = :studentId")
+    Integer countGroups(UUID studentId);
 
 //    @Query(value = "SELECT s.first_name, SUM(p.amount) FROM student s RIGHT JOIN payment p ON s.id = (SELECT student_id FROM student_payments WHERE payments_id = p.id)", nativeQuery = true)
 //    @Query(value = "SELECT s.* FROM student s JOIN payment ON s.id IN (SELECT student_id FROM student_payments WHERE payments_id = payment.id) ORDER BY last_name", nativeQuery = true)

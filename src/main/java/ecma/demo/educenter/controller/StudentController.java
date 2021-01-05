@@ -55,9 +55,9 @@ public class StudentController {
     }
 
     @DeleteMapping
-    public HttpEntity<?> stopStudying(@RequestParam UUID studentId){
-        ApiResponse apiResponse = studentService.stopStudying(studentId);
-        return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.OK: HttpStatus.CONFLICT).body(apiResponse);
+    public HttpEntity<?> delete(@RequestParam UUID studentId, @RequestParam UUID groupId){
+        ApiResponse apiResponse = studentService.deleteFromGroup(studentId, groupId);
+        return ResponseEntity.ok(apiResponse);
     }
 
 }
