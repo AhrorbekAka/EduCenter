@@ -19,13 +19,6 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/menu")
 public class MenuItemController {
-
-    private final MenuItemRepository menuRepository;
-
-    public MenuItemController(MenuItemRepository menuRepository) {
-        this.menuRepository = menuRepository;
-    }
-
     @GetMapping
     public HttpEntity<?> getMenu(@CurrentUser User user) {
         try {

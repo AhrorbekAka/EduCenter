@@ -85,37 +85,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/swagger-ui.html",
-                        "/swagger-resources/**",
-                        "/v2/**",
-                        "/csrf",
-                        "/webjars/**")
-                .permitAll()
+//                .antMatchers("/",
+//                        "/favicon.ico",
+//                        "/**/*.png",
+//                        "/**/*.gif",
+//                        "/**/*.svg",
+//                        "/**/*.jpg",
+//                        "/**/*.html",
+//                        "/**/*.css",
+//                        "/**/*.js",
+//                        "/swagger-ui.html",
+//                        "/swagger-resources/**",
+//                        "/v2/**",
+//                        "/csrf",
+//                        "/webjars/**")
+//                .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/api/auth/changePassword").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.POST, "/api/groups").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/groups", "/api/menu").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.GET, "/api/groups/with-s-balance").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/groups/teacher").hasAuthority("DIRECTOR")
-                .antMatchers(HttpMethod.PATCH, "/api/groups", "/api/groups/closeOrReopen").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PATCH,"/api/groups/closeOrReopen").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.DELETE,"/api/groups").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.POST, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.GET, "/api/student", "/api/student/search").hasAnyAuthority("ADMIN", "DIRECTOR")
-                .antMatchers(HttpMethod.PATCH, "/api/student/payment").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PATCH, "/api/student/payment", "/api/student/delete-from-group").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.DELETE, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/subject").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.POST, "/api/user").hasAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/user/me").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
-                .antMatchers(HttpMethod.GET, "/api/user").hasAnyAuthority("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.GET, "/api/user").hasAnyAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.PATCH, "/api/user/disable").hasAuthority("DIRECTOR")
-                .antMatchers(HttpMethod.PATCH, "/api/auth/changePassword").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.DELETE, "/api/user").hasAuthority("DIRECTOR")
                 .anyRequest().authenticated();
 
 //         Add our custom JWT security filter

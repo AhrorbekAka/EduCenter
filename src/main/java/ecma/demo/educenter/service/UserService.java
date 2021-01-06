@@ -1,33 +1,40 @@
 package ecma.demo.educenter.service;
 
+import ecma.demo.educenter.behavior.CRUDable;
+import ecma.demo.educenter.entity.Group;
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.RoleName;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqUser;
+import ecma.demo.educenter.repository.GroupRepository;
 import ecma.demo.educenter.repository.RoleRepository;
 import ecma.demo.educenter.repository.UserRepository;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements CRUDable {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final GroupRepository groupRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, GroupRepository groupRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.groupRepository = groupRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ApiResponse save(ReqUser reqUser) {
+    @Override
+    public ApiResponse create(Object request) {
+        ReqUser reqUser = (ReqUser) request;
+
         try {
             User user = new User();
             if (reqUser.getId() != null) {
@@ -56,7 +63,12 @@ public class UserService {
         }
     }
 
-    public ApiResponse getAllEnabledUsers(boolean isEnabled) {
+    @Override
+    public ApiResponse read(User user, Object request) {
+        return getAllUsersByEnabled((Boolean) request);
+    }
+
+    private ApiResponse getAllUsersByEnabled(Boolean isEnabled) {
         try {
             return new ApiResponse("All users", true, userRepository.findAllByEnabledOrderByFirstName(isEnabled));
         } catch (Exception e) {
@@ -64,8 +76,16 @@ public class UserService {
         }
     }
 
+    @Override
+    public ApiResponse update(String field, Object request) {
+        if ("isEnabled".equals(field)) {
+            return disableEnableUser((UUID) request);
+        } else {
+            return new ApiResponse("Error ", false);
+        }
+    }
 
-    public ApiResponse disableEnableUser(UUID userId) {
+    private ApiResponse disableEnableUser(UUID userId) {
         try {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
@@ -83,21 +103,26 @@ public class UserService {
         }
     }
 
+    @Override
     public ApiResponse delete(UUID id) {
         try {
-            userRepository.deleteById(id);
-            return new ApiResponse("User deleted", true);
-        } catch (Exception e) {
-            return new ApiResponse("Error user could be deleted!!!", false);
-        }
-    }
-
-    public void changePassword(User currentUser, String newPassword) {
-        try {
-            currentUser.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(currentUser);
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                if (!user.isEnabled()) {
+                    List<Group> groupList = groupRepository.findAllByTeacherId(id);
+                    for (Group group : groupList) {
+                        group.getTeachers().remove(user);
+                        groupRepository.save(group);
+                    }
+                    userRepository.delete(user);
+                    return new ApiResponse("User deleted", true);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return new ApiResponse("Error user couldn't be deleted!!!", false);
     }
+
 }

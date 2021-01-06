@@ -1,5 +1,6 @@
 package ecma.demo.educenter.service;
 
+import ecma.demo.educenter.behavior.CRUDable;
 import ecma.demo.educenter.entity.*;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import ecma.demo.educenter.payload.ApiResponse;
@@ -7,36 +8,39 @@ import ecma.demo.educenter.payload.ReqGroup;
 import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
 import ecma.demo.educenter.repository.*;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class GroupService {
+public class GroupService implements CRUDable {
 
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final TimeTableRepository timeTableRepository;
     private final StudentRepository studentRepository;
+    private final PaymentRepository paymentRepository;
 
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository, StudentRepository studentRepository) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository, StudentRepository studentRepository, PaymentRepository paymentRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.timeTableRepository = timeTableRepository;
         this.studentRepository = studentRepository;
+        this.paymentRepository = paymentRepository;
     }
 
-    public ApiResponse saveOrEdit(ReqGroup reqGroup) {
+    @Override
+    public ApiResponse create(Object request) {
+        ReqGroup reqGroup = (ReqGroup) request;
+
         Group group = new Group();
 
-        if(reqGroup.getId()!=null){
+        if (reqGroup.getId() != null) {
             Optional<Group> optionalGroup = groupRepository.findById(reqGroup.getId());
-            if(optionalGroup.isPresent()) group = optionalGroup.get();
+            if (optionalGroup.isPresent()) group = optionalGroup.get();
         } else {
             group.setStudents(new ArrayList<>());
             group.setPresent(true);
@@ -103,22 +107,15 @@ public class GroupService {
         }
     }
 
-    public ApiResponse  getGroupsForCurrentUser(User user, int page, boolean present) {
-        try {
-            Pageable pageable = PageRequest.of(page, 10, Sort.by("name"));
-//            for (Role role : user.getRoles()) {
-//                if (role.getName() == RoleName.DIRECTOR || role.getName() == RoleName.ADMIN) {
-//                    return new ApiResponse("All groups", true, groupRepository.findAllByIsPresentOrderByName(present));
-//                }
-//            }
-            return getGroupsByTeacher(user.getId(), pageable);
-//        return new ApiResponse("Groups for current user", true, groupRepository.findAllByTeacherId(user.getId(), present, pageable));
-        } catch (Exception e) {
-            return new ApiResponse("Error can't find group", false);
+    @Override
+    public ApiResponse read(User user, Object request) {
+        if (user == null) {
+            return getAllWithStudentBalance((Boolean) request);
         }
+        return getGroupsForCurrentUser(user, (ReqGroup) request);
     }
 
-    public ApiResponse getAllWithStudentBalance(Boolean isPresent) {
+    private ApiResponse getAllWithStudentBalance(Boolean isPresent) {
         try {
             List<Group> groupList = groupRepository.findAllByIsPresentOrderByName(isPresent);
 
@@ -138,9 +135,17 @@ public class GroupService {
             }
 
             return new ApiResponse("All Groups With Student Balance", true, resGroupList);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ApiResponse("Error", false);
+        }
+    }
+
+    private ApiResponse getGroupsForCurrentUser(User user, ReqGroup reqGroup) {
+        try {
+            return getGroupsByTeacher(user.getId(), reqGroup.getPageable());
+        } catch (Exception e) {
+            return new ApiResponse("Error can't find group", false);
         }
     }
 
@@ -152,12 +157,47 @@ public class GroupService {
         }
     }
 
-    public ApiResponse closeOrReopenGroup(UUID groupId) {
-        Optional<Group> optionalGroup = groupRepository.findById(groupId);
-        optionalGroup.ifPresent(group -> {
-            group.setPresent(!group.isPresent());
-            groupRepository.save(group);
-        });
-        return new ApiResponse("Group status changed", true);
+    @Override
+    public ApiResponse update(String field, Object request) {
+        if (field.equals("isPresent")) {
+            return openCloseGroup((UUID) request);
+        }
+        return new ApiResponse("Error", false);
+    }
+
+    private ApiResponse openCloseGroup(UUID groupId) {
+        try {
+            Optional<Group> optionalGroup = groupRepository.findById(groupId);
+            optionalGroup.ifPresent(group -> {
+                group.setPresent(!group.isPresent());
+                groupRepository.save(group);
+            });
+            return new ApiResponse("Group status changed", true);
+        } catch (Exception e) {
+            return new ApiResponse("Error", false);
+        }
+    }
+
+
+    @Override
+    public ApiResponse delete(UUID id) {
+        try {
+            Optional<Group> optionalGroup = groupRepository.findById(id);
+            if (optionalGroup.isPresent()) {
+                Group group = optionalGroup.get();
+                if (!group.isPresent()) {
+                    List<Payment> paymentList = paymentRepository.findAllByGroup(group);
+                    for (Payment payment : paymentList) {
+                        paymentRepository.delete(payment);
+                    }
+
+                    groupRepository.delete(group);
+                    return new ApiResponse("Group deleted", true);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ApiResponse("Error", false);
     }
 }

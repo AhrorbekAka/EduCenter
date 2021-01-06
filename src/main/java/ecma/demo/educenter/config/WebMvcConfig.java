@@ -13,6 +13,7 @@ import org.springframework.web.servlet.resource.ResourceResolverChain;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -32,10 +33,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResolver(new PushStateResourceResolver());
     }
 
-    private class PushStateResourceResolver implements ResourceResolver {
-        private Resource index = new ClassPathResource("/static/index.html");
-        private List<String> handledExtensions = Arrays.asList("html", "js", "json", "csv", "css", "png", "svg", "eot", "ttf", "otf", "woff", "appcache", "jpg", "jpeg", "gif", "ico");
-        private List<String> ignoredPaths = Arrays.asList("api");
+    private static class PushStateResourceResolver implements ResourceResolver {
+        private final Resource index = new ClassPathResource("/static/index.html");
+        private final List<String> handledExtensions = Arrays.asList("html", "js", "json", "csv", "css", "png", "svg", "eot", "ttf", "otf", "woff", "appcache", "jpg", "jpeg", "gif", "ico");
+        private final List<String> ignoredPaths = Collections.singletonList("api");
 
         @Override
         public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {

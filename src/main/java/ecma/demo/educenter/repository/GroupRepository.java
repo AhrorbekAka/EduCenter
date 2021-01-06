@@ -23,6 +23,9 @@ public interface GroupRepository extends JpaRepository<Group, UUID> {
     @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_teachers gt ON g.id = gt.groups_id AND gt.teachers_id = :teacherId AND g.is_present = :present", nativeQuery = true)
     List<Group> findAllByTeacherId(UUID teacherId, boolean present, Pageable pageable);
 
+    @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_teachers gt ON g.id = gt.groups_id AND gt.teachers_id = :teacherId", nativeQuery = true)
+    List<Group> findAllByTeacherId(UUID teacherId);
+
     @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_students gs on g.id = gs.groups_id AND gs.students_id = :id WHERE g.is_present = true", nativeQuery = true)
     List<Group> findAllByStudentId(UUID id);
 

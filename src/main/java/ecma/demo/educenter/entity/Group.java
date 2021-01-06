@@ -19,7 +19,7 @@ public class Group extends AbsEntity {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Student> students;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

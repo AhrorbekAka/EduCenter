@@ -2,11 +2,11 @@ package ecma.demo.educenter.payload;
 
 import ecma.demo.educenter.entity.Student;
 import ecma.demo.educenter.entity.TimeTable;
-import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,5 +35,7 @@ public class ReqGroup {
     private double paymentForThisMonth;
 
     private String description;
+
+    private Pageable pageable;
 
 }

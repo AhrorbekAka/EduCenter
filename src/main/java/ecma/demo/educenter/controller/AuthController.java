@@ -2,15 +2,16 @@ package ecma.demo.educenter.controller;
 
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.payload.*;
+import ecma.demo.educenter.repository.UserRepository;
 import ecma.demo.educenter.security.CurrentUser;
 import ecma.demo.educenter.security.JwtTokenProvider;
-import ecma.demo.educenter.service.UserService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,12 +20,14 @@ public class AuthController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserService userService) {
+    public AuthController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
-        this.userService = userService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -55,11 +58,20 @@ public class AuthController {
             if (!(newPassword.equals(confirmNewPassword) && authentication.isAuthenticated())) {
                 return new ApiResponse("Yangi parol uchun kiritilgan qiymatlar teng emas. Iltimos boshqatdan urunib ko`ring.", false);
             }
-            userService.changePassword(currentUser, newPassword);
+            changePassword(currentUser, newPassword);
 
             return new ApiResponse("Parolingiz muvafaqiyatli \uD83D\uDE0A o`zgartirildi ! ! !", true);
         } catch (Exception e) {
             return new ApiResponse("Parolni noto`g`ri kiritdingiz. Iltimos boshqatdan urunib ko`ring.", false);
+        }
+    }
+
+    private void changePassword(User currentUser, String newPassword) {
+        try {
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(currentUser);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

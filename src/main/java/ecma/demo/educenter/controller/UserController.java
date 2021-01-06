@@ -4,6 +4,7 @@ import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqUser;
 import ecma.demo.educenter.security.CurrentUser;
+import ecma.demo.educenter.behavior.CRUDable;
 import ecma.demo.educenter.service.UserService;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpEntity;
@@ -11,22 +12,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final UserService userService;
+    private final CRUDable crudable;
 
     public UserController(UserService userService) {
-        this.userService = userService;
+        this.crudable = userService;
     }
 
     @PostMapping
     public HttpEntity<?> save(@RequestBody ReqUser reqUser) {
-        ApiResponse apiResponse = userService.save(reqUser);
+        ApiResponse apiResponse = crudable.create(reqUser);
         return ResponseEntity.status(apiResponse.isSuccess()? HttpStatus.CREATED: HttpStatus.CONFLICT).body(apiResponse);
     }
 
@@ -38,16 +38,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse("Error", false));
     }
 
-    // havsizligi qilinmagan
     @GetMapping
-    public HttpEntity<?> getAllEnabledUsers(@RequestParam(required = false, defaultValue = "true") Boolean isEnabled) {
-        ApiResponse apiResponse = userService.getAllEnabledUsers(isEnabled);
+    public HttpEntity<?> getAllUsersByEnabled(@RequestParam(required = false, defaultValue = "true") Boolean isEnabled) {
+        ApiResponse apiResponse = crudable.read(null, isEnabled);
         return ResponseEntity.ok(apiResponse);
     }
 
     @PatchMapping("/disable")
     public HttpEntity<?> disableEnableUser(@RequestParam UUID userId) {
-        ApiResponse apiResponse = userService.disableEnableUser(userId);
+        ApiResponse apiResponse = crudable.update("isEnabled", userId);
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @DeleteMapping
+    public HttpEntity<?> delete(@RequestParam UUID userId) {
+        ApiResponse apiResponse = crudable.delete(userId);
         return ResponseEntity.ok(apiResponse);
     }
 }
