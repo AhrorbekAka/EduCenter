@@ -2,7 +2,6 @@ package ecma.demo.educenter.service;
 
 import ecma.demo.educenter.behavior.CRUDable;
 import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Role;
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.RoleName;
 import ecma.demo.educenter.payload.ApiResponse;
@@ -80,16 +79,6 @@ public class UserService implements CRUDable {
     @Override
     public ApiResponse update(String field, Object request) {
         if ("isEnabled".equals(field)) {
-            try {
-                Optional<User> optionalUser = userRepository.findByPhoneNumber("+998994032842");
-                if (optionalUser.isPresent()) {
-                    User user = optionalUser.get();
-                    user.getRoles().remove(roleRepository.findByName(RoleName.ADMIN));
-                    user.getRoles().remove(roleRepository.findByName(RoleName.TEACHER));
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
             return disableEnableUser((UUID) request);
         } else {
             return new ApiResponse("Error ", false);
