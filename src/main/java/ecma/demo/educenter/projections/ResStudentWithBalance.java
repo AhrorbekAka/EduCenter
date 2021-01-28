@@ -1,7 +1,5 @@
 package ecma.demo.educenter.projections;
 
-import org.hibernate.annotations.Type;
-
 import java.util.UUID;
 
 public interface ResStudentWithBalance {

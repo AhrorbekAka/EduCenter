@@ -5,9 +5,13 @@ import ecma.demo.educenter.entity.*;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqGroup;
+import ecma.demo.educenter.payload.Request;
+import ecma.demo.educenter.projections.ResGroupsWithAttendance;
 import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
+import ecma.demo.educenter.projections.ResStudentsWithAttendance;
 import ecma.demo.educenter.repository.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +26,23 @@ public class GroupService implements CRUDable {
     private final TimeTableRepository timeTableRepository;
     private final StudentRepository studentRepository;
     private final PaymentRepository paymentRepository;
+    private final AttendanceRepository attendanceRepository;
 
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository, StudentRepository studentRepository, PaymentRepository paymentRepository) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, SubjectRepository subjectRepository, TimeTableRepository timeTableRepository, StudentRepository studentRepository, PaymentRepository paymentRepository, AttendanceRepository attendanceRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.timeTableRepository = timeTableRepository;
         this.studentRepository = studentRepository;
         this.paymentRepository = paymentRepository;
+        this.attendanceRepository = attendanceRepository;
     }
 
     @Override
-    public ApiResponse create(Object request) {
-        ReqGroup reqGroup = (ReqGroup) request;
-
+    public ApiResponse create(Request request) {
+        ReqGroup reqGroup = new ReqGroup();
+        if (request instanceof ReqGroup)
+            reqGroup = (ReqGroup) request;
         Group group = new Group();
 
         if (reqGroup.getId() != null) {
@@ -55,7 +62,7 @@ public class GroupService implements CRUDable {
 
         groupSetNewTimeTableOrEditCurrent(group, reqGroup.getPayment());
 
-        group.setTeachers(getUsersThatSelectedAsTeachers(reqGroup.getTeacherIdList()));
+        group.setTeachers(getUsersSelectedAsTeachers(reqGroup.getTeacherIdList()));
         group.setDescription(reqGroup.getDescription());
     }
 
@@ -77,7 +84,7 @@ public class GroupService implements CRUDable {
         }
     }
 
-    private List<User> getUsersThatSelectedAsTeachers(List<UUID> idList) {
+    private List<User> getUsersSelectedAsTeachers(List<UUID> idList) {
         List<User> teachers = new ArrayList<>();
         try {
             for (UUID teacherId : idList) {
@@ -110,6 +117,17 @@ public class GroupService implements CRUDable {
     @Override
     public ApiResponse read(User user, Object request) {
         if (user == null) {
+            try {
+                if (request instanceof SubjectName) {
+                    return new ApiResponse("Success", true, groupRepository.findAllBySubject_SubjectName((SubjectName) request));
+                } else if (request instanceof String) {
+                    List<Group> groupList = groupRepository.findAllByStudentPhoneNumber((String) request);
+                    if (groupList.size() < 1) return new ApiResponse("No group", false);
+                    return new ApiResponse("Success", true, groupList);
+                }
+            } catch (Exception e) {
+                return new ApiResponse("Error", false);
+            }
             return getAllWithStudentBalance((Boolean) request);
         }
         return getGroupsForCurrentUser(user, (ReqGroup) request);
@@ -151,7 +169,32 @@ public class GroupService implements CRUDable {
 
     public ApiResponse getGroupsByTeacher(UUID teacherId, Pageable pageable) {
         try {
-            return new ApiResponse("Groups by teacher", true, groupRepository.findAllByTeacherId(teacherId, true, pageable));
+            List<ResGroupsWithAttendance> resGroupList = new ArrayList<>();
+            List<Group> groupList = groupRepository.findAllByTeacherId(teacherId, true, pageable);
+            for (Group group : groupList) {
+                List<ResStudentsWithAttendance> resStudentList = new ArrayList<>();
+                for (Student student : group.getStudents()) {
+                    List<Attendance> attendancePage = attendanceRepository.findAllByGroupAndStudentOrderByCreatedAtDesc(group, student);
+                    resStudentList.add(new ResStudentsWithAttendance(
+                            student.getId(),
+                            student.getLastName(),
+                            student.getFirstName(),
+                            student.getPhoneNumber(),
+                            student.getParentsNumber(),
+                            student.getAddress(),
+                            attendancePage
+                    ));
+                }
+                resGroupList.add(new ResGroupsWithAttendance(
+                        group.getId(),
+                        group.getName(),
+                        resStudentList,
+                        group.getTeachers(),
+                        group.getSubject(),
+                        group.getDescription()
+                ));
+            }
+            return new ApiResponse("Groups by teacher", true, resGroupList);
         } catch (Exception e) {
             return new ApiResponse("Error groups not found", false);
         }

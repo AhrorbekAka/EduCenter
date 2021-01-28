@@ -7,7 +7,6 @@ import ecma.demo.educenter.repository.TimeTableRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component

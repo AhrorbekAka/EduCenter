@@ -1,9 +1,7 @@
 package ecma.demo.educenter.repository;
 
 import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Student;
-import ecma.demo.educenter.entity.User;
-import ecma.demo.educenter.projections.ResGroupWithStudentBalance;
+import ecma.demo.educenter.entity.enums.SubjectName;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +13,6 @@ import java.util.UUID;
 @Repository
 public interface GroupRepository extends JpaRepository<Group, UUID> {
 
-    @Query(value = "SELECT g.id, g.name, g.teachers, (SELECT s.*, p. FROM students s  )  FROM groups g WHERE g.is_present = true",nativeQuery = true)
-    List<Object> findAllWithPayment();
-
     List<Group> findAllByIsPresentOrderByName(boolean isPresent);
 
     @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_teachers gt ON g.id = gt.groups_id AND gt.teachers_id = :teacherId AND g.is_present = :present", nativeQuery = true)
@@ -28,6 +23,16 @@ public interface GroupRepository extends JpaRepository<Group, UUID> {
 
     @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_students gs on g.id = gs.groups_id AND gs.students_id = :id WHERE g.is_present = true", nativeQuery = true)
     List<Group> findAllByStudentId(UUID id);
+
+    List<Group> findAllBySubject_SubjectName(SubjectName subjectName);
+
+    @Query(nativeQuery = true, value = "" +
+            "SELECT distinct g.* " +
+            "FROM groups g " +
+            "JOIN groups_students gs ON g.id = gs.groups_id " +
+            "WHERE gs.students_id = (SELECT id FROM student WHERE phone_number = :phoneNumber)" +
+            "ORDER BY g.name")
+    List<Group> findAllByStudentPhoneNumber(String phoneNumber);
 
 //    @Query(nativeQuery = true, value = "SELECT " +
 //            "g.name as name, " +

@@ -1,21 +1,15 @@
 package ecma.demo.educenter.security;
 
 
-import ecma.demo.educenter.entity.User;
-import ecma.demo.educenter.entity.enums.RoleName;
-import ecma.demo.educenter.payload.ApiResponse;
-import ecma.demo.educenter.payload.ReqSignUp;
 import ecma.demo.educenter.repository.RoleRepository;
 import ecma.demo.educenter.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service("authService")

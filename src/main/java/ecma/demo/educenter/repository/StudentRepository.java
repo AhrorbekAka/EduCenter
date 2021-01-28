@@ -1,7 +1,9 @@
 package ecma.demo.educenter.repository;
 
 import ecma.demo.educenter.entity.Student;
+import ecma.demo.educenter.projections.ResGroupsWithAttendance;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
+import ecma.demo.educenter.projections.ResStudentsWithAttendance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,6 +40,19 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
             "FROM student s JOIN groups_students gs ON s.id = gs.students_id " +
             "WHERE gs.groups_id = :groupId AND s.is_studying_now = :isStudying ORDER BY s.last_name")
     List<ResStudentWithBalance> findAllWithBalanceByGroupIdAndIsStudyingNow(UUID groupId, Boolean isStudying);
+
+//    @Modifying
+//    @Query(nativeQuery = true, value = "SELECT " +
+//            "s.last_name as lastName, " +
+//            "Cast(s.id as varchar) as id, " +
+//            "s.first_name as firstName, " +
+//            "s.phone_number as phoneNumber, " +
+//            "s.parents_number as parentsNumber, " +
+//            "s.address as address, " +
+//            "(SELECT * FROM attendance) as attendances " +
+//            "FROM student s JOIN groups_students gs ON s.id = gs.students_id " +
+//            "WHERE gs.groups_id = :groupId AND s.is_studying_now = :isStudying ORDER BY s.last_name")
+//    List<ResStudentsWithAttendance> findAllWithAttendance(UUID groupId, Boolean isStudying, Pageable pageable);
 
     @Query(nativeQuery = true, value = "DELETE FROM groups_students WHERE students_id = :studentId AND groups_id = :groupId")
     void deleteFromGroupById(UUID studentId, UUID groupId);

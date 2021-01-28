@@ -11,8 +11,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReqStudent {
-    private UUID id;
+public class ReqStudent extends Request{
     private String firstName;
     private String lastName;
     private String phoneNumber;

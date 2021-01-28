@@ -1,14 +1,13 @@
 package ecma.demo.educenter.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import ecma.demo.educenter.entity.template.AbsEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -16,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Student extends AbsEntity {
+
     @Column(name = "FIRST_NAME", nullable = false, length = 50)
     private String firstName;
 
@@ -30,16 +30,6 @@ public class Student extends AbsEntity {
 
     @Column(name = "ADDRESS", nullable = false, length = 100)
     private String address;
-
-//    @OneToMany(fetch = FetchType.LAZY)
-//    private List<Payment> payments;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "GROUP_ID")
-//    private Group group;
-
-//    @OneToMany(fetch = FetchType.LAZY)
-//    private List<Payment> payments;
 
     private Boolean isStudyingNow;
 

@@ -5,18 +5,16 @@ import ecma.demo.educenter.entity.TimeTable;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ReqGroup {
-
-    private UUID id;
+public class ReqGroup extends Request{
 
     private String name;
 

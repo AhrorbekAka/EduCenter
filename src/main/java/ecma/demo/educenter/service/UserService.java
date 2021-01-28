@@ -6,6 +6,7 @@ import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.RoleName;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqUser;
+import ecma.demo.educenter.payload.Request;
 import ecma.demo.educenter.repository.GroupRepository;
 import ecma.demo.educenter.repository.RoleRepository;
 import ecma.demo.educenter.repository.UserRepository;
@@ -32,8 +33,10 @@ public class UserService implements CRUDable {
     }
 
     @Override
-    public ApiResponse create(Object request) {
-        ReqUser reqUser = (ReqUser) request;
+    public ApiResponse create(Request request) {
+        ReqUser reqUser = new ReqUser();
+        if (request instanceof ReqUser)
+            reqUser = (ReqUser) request;
 
         try {
             User user = new User();

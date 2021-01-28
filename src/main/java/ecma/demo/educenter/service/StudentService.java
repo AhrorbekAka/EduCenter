@@ -5,6 +5,7 @@ import ecma.demo.educenter.behavior.Searchable;
 import ecma.demo.educenter.entity.*;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.ReqStudent;
+import ecma.demo.educenter.payload.Request;
 import ecma.demo.educenter.projections.ResGroupsWithStudentsBalance;
 import ecma.demo.educenter.projections.ResStudentWithBalance;
 import ecma.demo.educenter.repository.GroupRepository;
@@ -31,8 +32,10 @@ public class StudentService implements CRUDable, Searchable {
     }
 
     @Override
-    public ApiResponse create(Object request) {
-        return save((ReqStudent) request);
+    public ApiResponse create(Request request) {
+        if (request instanceof ReqStudent)
+            return save((ReqStudent) request);
+        return new ApiResponse("Incorrect request", false);
     }
 
     public ApiResponse save(ReqStudent reqStudent) {
@@ -130,14 +133,14 @@ public class StudentService implements CRUDable, Searchable {
 
     @Override
     public ApiResponse update(String field, Object request) {
-        if(field.equals("delete-from-group")) {
+        if (field.equals("delete-from-group")) {
             UUID[] idArr = (UUID[]) request;
             return deleteFromGroup(idArr[0], idArr[1]);
         }
         return new ApiResponse("Error", false);
     }
 
-//    if the student has been deleted from all groups, student.setStudying = false
+    //    if the student has been deleted from all groups, student.setStudying = false
     private ApiResponse deleteFromGroup(UUID studentId, UUID groupId) {
         try {
             Optional<Group> optionalGroup = groupRepository.findById(groupId);
@@ -180,13 +183,13 @@ public class StudentService implements CRUDable, Searchable {
     public ApiResponse delete(UUID id) {
         try {
             Optional<Student> optionalStudent = studentRepository.findById(id);
-            if(optionalStudent.isPresent()) {
-                if(!optionalStudent.get().getIsStudyingNow()) {
+            if (optionalStudent.isPresent()) {
+                if (!optionalStudent.get().getIsStudyingNow()) {
                     studentRepository.delete(optionalStudent.get());
                     return new ApiResponse("Student deleted", true);
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ApiResponse("Error can't delete", false);

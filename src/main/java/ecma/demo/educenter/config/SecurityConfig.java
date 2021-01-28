@@ -101,6 +101,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                        "/webjars/**")
 //                .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/api/test/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/subject").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/test/**", "/api/question/by-test/**", "/api/groups/by-subject/**", "/api/groups/for-student/**").permitAll()
                 .antMatchers(HttpMethod.PATCH, "/api/auth/changePassword").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.POST, "/api/groups").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/groups", "/api/menu").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
@@ -112,12 +115,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/student", "/api/student/search").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.PATCH, "/api/student/payment", "/api/student/delete-from-group").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.DELETE, "/api/student").hasAnyAuthority("ADMIN", "DIRECTOR")
-                .antMatchers(HttpMethod.GET, "/api/subject").hasAnyAuthority("ADMIN", "DIRECTOR")
                 .antMatchers(HttpMethod.POST, "/api/user").hasAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.GET, "/api/user/me").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .antMatchers(HttpMethod.GET, "/api/user").hasAnyAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.PATCH, "/api/user/disable").hasAuthority("DIRECTOR")
                 .antMatchers(HttpMethod.DELETE, "/api/user").hasAuthority("DIRECTOR")
+                .antMatchers(HttpMethod.POST, "/api/attendance").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
+                .antMatchers(HttpMethod.GET, "/api/attendance").hasAnyAuthority("ADMIN", "DIRECTOR", "TEACHER")
                 .anyRequest().authenticated();
 
 //         Add our custom JWT security filter
