@@ -20,5 +20,5 @@ public class ReqQuestion extends Request {
     private String question;
     private MultipartFile file;
     private SubjectName subjectName;
-    private List<ReqAnswer> answers;
+    private List<String> answers;
 }

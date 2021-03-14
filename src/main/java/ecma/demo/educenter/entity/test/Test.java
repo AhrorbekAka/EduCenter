@@ -1,7 +1,6 @@
 package ecma.demo.educenter.entity.test;
 
 import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Subject;
 import ecma.demo.educenter.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
@@ -14,6 +13,8 @@ public class Test extends AbsEntity {
 
     private String title;
 
+    private String time;
+
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Group> groups;
 
@@ -22,8 +23,9 @@ public class Test extends AbsEntity {
 
     public Test(){}
 
-    public Test(String title, List<Group> groups, List<Question> questions) {
+    public Test(String title, String time, List<Group> groups, List<Question> questions) {
         this.title = title;
+        this.time = time;
         this.groups = groups;
         this.questions = questions;
     }
@@ -35,6 +37,10 @@ public class Test extends AbsEntity {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getTime() {return time;}
+
+    public void setTime(String time) {this.time = time;}
 
     public List<Group> getGroups() {
         return groups;
@@ -52,6 +58,7 @@ public class Test extends AbsEntity {
     public String toString() {
         return "Test{" +
                 "title='" + title + '\'' +
+                ", time='" + time + '\'' +
                 ", groups=" + groups +
                 ", questions=" + questions +
                 '}';

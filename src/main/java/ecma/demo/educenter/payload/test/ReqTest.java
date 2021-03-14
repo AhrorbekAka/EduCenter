@@ -17,6 +17,7 @@ import java.util.UUID;
 public class ReqTest extends Request {
     private UUID id;
     private String title;
+    private String time;
     private List<UUID> groupIdList;
     private List<ReqQuestion> reqQuestionList;
 }

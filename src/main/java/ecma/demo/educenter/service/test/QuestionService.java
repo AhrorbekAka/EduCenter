@@ -73,21 +73,15 @@ public class QuestionService implements Creatable, ListCreatable, Readable {
         }
     }
 
-    private void saveAnswerList(List<ReqAnswer> reqAnswerList, Question question) {
-        int counter = 0;
-        for (ReqAnswer reqAnswer : reqAnswerList) {
-            if (reqAnswer.getIsCorrect()) counter++;
-            if (counter > 1) {
-                --counter;
-                break;
-            }
-            saveAnswer(reqAnswer, question);
+    private void saveAnswerList(List<String> reqAnswerList, Question question) {
+        for (String reqAnswer : reqAnswerList) {
+            saveAnswer(reqAnswer, reqAnswerList.indexOf(reqAnswer) == 0, question);
         }
     }
 
-    private void saveAnswer(ReqAnswer reqAnswer, Question question) {
+    private void saveAnswer(String answer, boolean isCorrect, Question question) {
         try {
-            answerRepository.save(new Answer(reqAnswer.getAnswer(), reqAnswer.getIsCorrect(), question));
+            answerRepository.save(new Answer(answer, isCorrect, question));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -58,7 +58,7 @@ public class TestService implements Creatable, Readable, Checkable {
             final List<Group> groupList = findGroupsById(reqTest.getGroupIdList());
             final List<Question> questionList = saveAndReturnQuestions(reqTest.getReqQuestionList());
 
-            testRepository.save(new Test(reqTest.getTitle(), groupList, questionList));
+            testRepository.save(new Test(reqTest.getTitle(), (reqTest.getTime()+":00"), groupList, questionList));
             return new ApiResponse("Test saved", true);
         } catch (Exception e) {
             return new ApiResponse("Error", false);

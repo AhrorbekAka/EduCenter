@@ -5,4 +5,5 @@ import java.util.UUID;
 public interface ResTest {
     UUID getId();
     String getTitle();
+    String getTime();
 }

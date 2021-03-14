@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface TestRepository extends JpaRepository<Test, UUID> {
 
     @Query(nativeQuery = true, value="" +
-            "SELECT Cast(t.id as varchar) as id, t.title as title " +
+            "SELECT Cast(t.id as varchar) as id, t.title as title, t.time as time " +
             "FROM test t " +
             "JOIN test_groups tg ON t.id = tg.test_id " +
             "WHERE tg.groups_id = :groupId ORDER BY t.created_at DESC")
