@@ -54,7 +54,8 @@ public class UserService implements CRUDable {
             if (reqUser.getRoleName().equals(String.valueOf(RoleName.DIRECTOR))) {
                 return new ApiResponse("No one can save DIRECTOR", false);
             }
-            user.setRoles(roleRepository.findAllByName(RoleName.valueOf(reqUser.getRoleName())));
+            if(reqUser.getRoleName().length()>0)
+                user.setRoles(roleRepository.findAllByName(RoleName.valueOf(reqUser.getRoleName())));
 
             user.setFirstName(reqUser.getFirstName());
             user.setLastName(reqUser.getLastName());
