@@ -76,10 +76,10 @@ public class DataLoader implements CommandLineRunner {
     private void saveUser(Set<Role> roles) {
         try {
             userRepository.save(new User(
-                    passwordEncoder.encode("123"),
+                    passwordEncoder.encode("12A13"),
                     "Ahror",
                     "Nematov",
-                    "+998943600123",
+                    "+998994032842",
                     roles
             ));
         } catch (Exception e){
