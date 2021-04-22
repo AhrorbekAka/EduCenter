@@ -67,9 +67,9 @@ public class DataLoader implements CommandLineRunner {
         List<MenuItem> menu = menuItemRepository.findAll(Sort.by("id"));
         roles.add(roleRepository.save(new Role(1, RoleName.DIRECTOR, menu)));
 //        menu.remove(0);
-//        roles.add(roleRepository.save(new Role(2, RoleName.ADMIN, menu)));
+        roleRepository.save(new Role(2, RoleName.ADMIN, menu));
 //        menu.remove(0);
-//        roles.add(roleRepository.save(new Role(3, RoleName.TEACHER, menu)));
+        roleRepository.save(new Role(3, RoleName.TEACHER, menu));
         return roles;
     }
 
