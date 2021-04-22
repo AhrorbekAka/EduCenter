@@ -77,8 +77,8 @@ public class DataLoader implements CommandLineRunner {
         try {
             userRepository.save(new User(
                     passwordEncoder.encode("12A13"),
-                    "Ahror",
-                    "Nematov",
+                    "Mr.",
+                    "Director",
                     "+998994032842",
                     roles
             ));
