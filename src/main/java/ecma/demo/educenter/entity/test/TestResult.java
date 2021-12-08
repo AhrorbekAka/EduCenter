@@ -26,7 +26,7 @@ public class TestResult extends AbsEntity {
 
     private int attempts;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private StudentHistory studentHistory;
 }

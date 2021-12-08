@@ -1,6 +1,5 @@
 package ecma.demo.educenter.repository.test;
 
-import ecma.demo.educenter.entity.Subject;
 import ecma.demo.educenter.entity.enums.SubjectName;
 import ecma.demo.educenter.entity.test.Test;
 import ecma.demo.educenter.projections.ResTest;

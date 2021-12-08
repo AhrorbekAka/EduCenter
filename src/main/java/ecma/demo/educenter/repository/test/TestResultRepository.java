@@ -1,5 +1,6 @@
 package ecma.demo.educenter.repository.test;
 
+import ecma.demo.educenter.entity.StudentHistory;
 import ecma.demo.educenter.entity.test.Test;
 import ecma.demo.educenter.entity.test.TestResult;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,7 @@ import java.util.UUID;
 
 @Repository
 public interface TestResultRepository extends JpaRepository<TestResult, UUID> {
-    Optional<TestResult> findByTest(Test test);
+    Optional<TestResult> findByTestAndStudentHistory(Test test, StudentHistory studentHistory);
+
+    Optional<TestResult> findByStudentHistory(StudentHistory studentHistory);
 }

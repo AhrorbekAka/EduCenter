@@ -4,7 +4,6 @@ import ecma.demo.educenter.behavior.Checkable;
 import ecma.demo.educenter.behavior.Creatable;
 import ecma.demo.educenter.behavior.Readable;
 import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Student;
 import ecma.demo.educenter.entity.StudentHistory;
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.SubjectName;
@@ -18,7 +17,8 @@ import ecma.demo.educenter.payload.test.ReqQuestion;
 import ecma.demo.educenter.payload.test.ReqTest;
 import ecma.demo.educenter.projections.ResTest;
 import ecma.demo.educenter.repository.GroupRepository;
-import ecma.demo.educenter.repository.StudentHisRepository;
+import ecma.demo.educenter.repository.StudentHistoryRepository;
+import ecma.demo.educenter.repository.StudentRepository;
 import ecma.demo.educenter.repository.test.TestRepository;
 import ecma.demo.educenter.repository.test.TestResultRepository;
 import org.springframework.stereotype.Service;
@@ -35,14 +35,16 @@ public class TestService implements Creatable, Readable, Checkable {
     private final TestRepository testRepository;
     private final TestResultRepository testResultRepository;
     private final QuestionService questionService;
-    private final StudentHisRepository studentHisRepository;
+    private final StudentHistoryRepository studentHistoryRepository;
+    private final StudentRepository studentRepository;
 
-    public TestService(TestRepository testRepository, GroupRepository groupRepository, TestResultRepository testResultRepository, QuestionService questionService, StudentHisRepository studentHisRepository) {
+    public TestService(TestRepository testRepository, GroupRepository groupRepository, TestResultRepository testResultRepository, QuestionService questionService, StudentHistoryRepository studentHistoryRepository, StudentRepository studentRepository) {
         this.testRepository = testRepository;
         this.groupRepository = groupRepository;
         this.testResultRepository = testResultRepository;
         this.questionService = questionService;
-        this.studentHisRepository = studentHisRepository;
+        this.studentHistoryRepository = studentHistoryRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class TestService implements Creatable, Readable, Checkable {
             final List<Group> groupList = findGroupsById(reqTest.getGroupIdList());
             final List<Question> questionList = saveAndReturnQuestions(reqTest.getReqQuestionList());
 
-            testRepository.save(new Test(reqTest.getTitle(), (reqTest.getTime()+":00"), groupList, questionList));
+            testRepository.save(new Test(reqTest.getTitle(), (reqTest.getTime() + ":00"), groupList, questionList));
             return new ApiResponse("Test saved", true);
         } catch (Exception e) {
             return new ApiResponse("Error", false);
@@ -106,35 +108,38 @@ public class TestService implements Creatable, Readable, Checkable {
     public ApiResponse check(String studentPhoneNumber, UUID testId, List<UUID> answerIdList) {
         try {
             final List<UUID> resCorrectAnswerIdList = questionService.checkAnswers(answerIdList);
+            final StudentHistory studentHistory = getStudentHistoryByPhoneNumber(studentPhoneNumber);
 
-            final Optional<Test> optionalTest = testRepository.findById(testId);
-            final Optional<StudentHistory> optionalStudentHis = studentHisRepository.findByStudent_phoneNumber(studentPhoneNumber);
-            if (optionalStudentHis.isPresent() && optionalTest.isPresent()) {
+            Optional<Test> optionalTest = testRepository.findById(testId);
+            if (optionalTest.isPresent()) {
                 final Test test = optionalTest.get();
-                final StudentHistory studentHistory = optionalStudentHis.get();
 
-                Optional<TestResult> byTest = testResultRepository.findByTest(test);
+                TestResult testResult;
+                Optional<TestResult> byTest = testResultRepository.findByTestAndStudentHistory(test, studentHistory);
                 if (byTest.isPresent()) {
-                    boolean isFirstAttempt = true;
-                    for (TestResult testResult : studentHistory.getTestResults()) {
-                        if (testResult.getTest() == test) {
-                            testResult.setAttempts(testResult.getAttempts() + 1);
-                            testResult.setResult(resCorrectAnswerIdList.size());
+                    testResult = byTest.get();
 
-                            testResultRepository.save(testResult);
-                            isFirstAttempt = false;
-                            break;
-                        }
-                    }
-                    if (isFirstAttempt) {
-                        testResultRepository.save(new TestResult(test, resCorrectAnswerIdList.size(), 1, studentHistory));
-                    }
-                    studentHisRepository.save(studentHistory);
+                    testResult.setAttempts(testResult.getAttempts() + 1);
+                    testResult.setResult(resCorrectAnswerIdList.size());
+
+                } else {
+                    testResult = new TestResult(test, resCorrectAnswerIdList.size(), 1, studentHistory);
                 }
+                testResultRepository.save(testResult);
             }
             return new ApiResponse("Success", true, resCorrectAnswerIdList);
         } catch (Exception e) {
             return new ApiResponse("Error", false);
+        }
+    }
+
+    private StudentHistory getStudentHistoryByPhoneNumber(String phoneNumber) {
+        try {
+            final Optional<StudentHistory> optionalStudentHis = studentHistoryRepository.findByStudent_phoneNumber(phoneNumber);
+            return optionalStudentHis.orElseGet(
+                    () -> studentHistoryRepository.save(new StudentHistory(studentRepository.findByPhoneNumber(phoneNumber))));
+        } catch (Exception e) {
+            return null;
         }
     }
 }

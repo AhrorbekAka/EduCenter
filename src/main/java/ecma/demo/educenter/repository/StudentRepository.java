@@ -60,6 +60,7 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
     @Query(nativeQuery = true, value = "SELECT count(*) FROM groups_students WHERE students_id = :studentId")
     Integer countGroups(UUID studentId);
 
+    Student findByPhoneNumber(String phoneNumber);
 //    @Query(value = "SELECT s.first_name, SUM(p.amount) FROM student s RIGHT JOIN payment p ON s.id = (SELECT student_id FROM student_payments WHERE payments_id = p.id)", nativeQuery = true)
 //    @Query(value = "SELECT s.* FROM student s JOIN payment ON s.id IN (SELECT student_id FROM student_payments WHERE payments_id = payment.id) ORDER BY last_name", nativeQuery = true)
 //    List<Student> findAllWithPaymentsSumOrderByLastName();

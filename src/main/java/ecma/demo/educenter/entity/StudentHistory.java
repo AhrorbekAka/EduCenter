@@ -29,4 +29,7 @@ public class StudentHistory extends AbsEntity {
     @OneToMany(mappedBy = "studentHistory", fetch = FetchType.LAZY)
     private List<TestResult> testResults;
 
+    public StudentHistory(Student student) {
+        this.student = student;
+    }
 }
