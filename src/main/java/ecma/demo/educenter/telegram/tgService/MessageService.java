@@ -50,40 +50,16 @@ public class MessageService {
                 sendMessage.setText("Botdan foydalanish uchun telefon raqamingiz zarur bo`ladi!");
                 this.state.put(chatId, Constant.START);
             } else if(this.state.get(chatId).equals(Constant.GROUP)) {
-                ApiResponse answerList = groupService.read(null, true);
-                List<ResGroupsWithStudentsBalance> groupList = (List<ResGroupsWithStudentsBalance>) answerList.getObject();
-                for (ResGroupsWithStudentsBalance group : groupList) {
-                    if(group.getName().equals(text)){
-                        sendMessage.setReplyMarkup(buttonService.studentsKeyboard(group.getStudents(), group.getId().toString()));
-                        sendMessage.setText(group.getName());
-                    }
-                }
+                sendGroup(sendMessage, text, "");
             } else if(this.state.get(chatId).equals(Constant.SAVE_NEW_STUDENT)) {
-                ReqStudent reqStudent;
-                List<UUID> groupIdList;
-                String[] students = text.split("\n\n");
-                for (String student : students) {
-                    String[] studentInfo = student.split("\n");
-                    if(student.length()<2) throw new ArrayIndexOutOfBoundsException();
-                    reqStudent = new ReqStudent();
-
-                    reqStudent.setLastName(studentInfo[0]);
-                    reqStudent.setFirstName(studentInfo[1]);
-                    reqStudent.setPhoneNumber(studentInfo.length>2?studentInfo[2]:"");
-                    reqStudent.setParentsNumber(studentInfo.length>3?studentInfo[3]:"");
-                    reqStudent.setAddress(studentInfo.length>4?studentInfo[4]:"");
-
-                    groupIdList = new ArrayList<>();
-                    groupIdList.add(this.groupId.get(chatId));
-                    reqStudent.setGroupIdList(groupIdList);
-                    studentService.create(reqStudent);
-                }
+                addStudents(chatId, text);
                 this.state.put(chatId, Constant.GROUP);
+                sendGroup(sendMessage, "", String.valueOf(this.groupId.get(chatId)));
             }
         }
         else if(message.hasContact()) {
             Contact contact = message.getContact();
-            User user = getUser(contact.getPhoneNumber());
+            User user = getUser((contact.getPhoneNumber().startsWith("+")?"":"+")+contact.getPhoneNumber());
             if(user == null) {
                 sendMessage.setText("Siz foydalanuvchilar ro`yhatida yo`qsiz.");
                 return sendMessage;
@@ -116,9 +92,44 @@ public class MessageService {
         }
     }
 
+    private void sendGroup(SendMessage sendMessage, String groupName, String groupId){
+        ApiResponse answerList = groupService.read(null, true);
+        List<ResGroupsWithStudentsBalance> groupList = (List<ResGroupsWithStudentsBalance>) answerList.getObject();
+        for (ResGroupsWithStudentsBalance group : groupList) {
+            if(group.getName().equals(groupName) || String.valueOf(group.getId()).equals(groupId)){
+                sendMessage.setReplyMarkup(buttonService.studentsKeyboard(group.getStudents(), group.getId().toString()));
+                sendMessage.setText(group.getName());
+                break;
+            }
+        }
+    }
+
+    private void addStudents(Long chatId, String text) {
+        ReqStudent reqStudent;
+        List<UUID> groupIdList;
+        String[] students = text.split("\n\n");
+        for (String student : students) {
+            String[] studentInfo = student.split("\n");
+            if(student.length()<2) throw new ArrayIndexOutOfBoundsException();
+            reqStudent = new ReqStudent();
+
+            reqStudent.setLastName(studentInfo[0]);
+            reqStudent.setFirstName(studentInfo[1]);
+            reqStudent.setPhoneNumber(studentInfo.length>2?studentInfo[2]:"");
+            reqStudent.setParentsNumber(studentInfo.length>3?studentInfo[3]:"");
+            reqStudent.setAddress(studentInfo.length>4?studentInfo[4]:"");
+
+            groupIdList = new ArrayList<>();
+            groupIdList.add(this.groupId.get(chatId));
+            reqStudent.setGroupIdList(groupIdList);
+            studentService.create(reqStudent);
+        }
+    }
+
     public SendMessage replyTo(CallbackQuery callbackQuery) {
+        Long chatId = callbackQuery.getMessage().getChatId();
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(callbackQuery.getMessage().getChatId().toString());
+        sendMessage.setChatId(chatId.toString());
 
         String data = callbackQuery.getData();
         if (data.equals("GROUPS")) {
@@ -127,7 +138,7 @@ public class MessageService {
             sendMessage.setReplyMarkup(buttonService.groupsKeyboard(groupList));
             sendMessage.setText("Kerakli guruhni tanlang");
 
-            this.state.replace(callbackQuery.getMessage().getChatId(), Constant.GROUP);
+            this.state.put(chatId, Constant.GROUP);
         } else if(data.equals("SEARCH")){
             sendMessage.setText("Bu tugma hozircha aktivlashtirilmagan.");
 //        } else if(data.endsWith("GROUP")) {
@@ -143,8 +154,8 @@ public class MessageService {
 //            }
         } else if(data.endsWith(Constant.NEW_STUDENT.name())) {
             data = data.split(" ")[0];
-            this.groupId.put(callbackQuery.getMessage().getChatId(), UUID.fromString(data));
-            this.state.put(callbackQuery.getMessage().getChatId(), Constant.SAVE_NEW_STUDENT);
+            this.groupId.put(chatId, UUID.fromString(data));
+            this.state.put(chatId, Constant.SAVE_NEW_STUDENT);
 
             sendMessage.enableHtml(true);
             sendMessage.setText("\uD83D\uDC47 <b>Ma'lumotlarni quyidagi tartibda kiriting</b> \uD83D\uDC47 \n" +

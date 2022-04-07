@@ -88,15 +88,17 @@ public class ButtonService {
         List<List<InlineKeyboardButton>> lists = new ArrayList<>();
         List<InlineKeyboardButton> list;
         InlineKeyboardButton btn;
+        int i = 1;
 
         for (ResStudentWithBalance student : students) {
             list = new ArrayList<>();
             btn = new InlineKeyboardButton();
-            btn.setText(student.getLastName() + " " + student.getFirstName() + (
+            btn.setText(String.valueOf(i)+". "+student.getLastName() + " " + student.getFirstName() + (
                     student.getBalance() != null && student.getBalance() < 0 ? " \uD83D\uDD34" : " \uD83D\uDFE2"));
             btn.setCallbackData(student.getId().toString());
             list.add(btn);
             lists.add(list);
+            i++;
         }
 
 
