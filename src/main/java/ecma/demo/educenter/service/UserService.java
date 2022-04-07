@@ -72,6 +72,20 @@ public class UserService implements CRUDable {
         return getAllUsersByEnabled((Boolean) request);
     }
 
+    public User getByPhoneNumber(String phoneNumber) {
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        return optionalUser.orElseThrow(NullPointerException::new);
+    }
+
+    public String identifyRollByPhoneNumber(String phoneNumber) {
+        Optional<List<String>> optionalRolls = userRepository.findRolesByPhoneNumber(phoneNumber);
+        if(optionalRolls.isPresent()) {
+            return optionalRolls.get().get(0);
+        } else {
+            throw new NullPointerException();
+        }
+    }
+
     private ApiResponse getAllUsersByEnabled(Boolean isEnabled) {
         try {
             return new ApiResponse("All users", true, userRepository.findAllByEnabledOrderByFirstName(isEnabled));

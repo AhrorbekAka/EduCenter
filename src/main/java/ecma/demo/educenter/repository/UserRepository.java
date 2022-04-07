@@ -14,6 +14,12 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
+    @Query(nativeQuery = true,
+            value = "SELECT ur.role_id " +
+                    "FROM user_role ur JOIN users u ON ur.user_id = u.id " +
+                    "WHEN u.phone_number = :phoneNumber")
+    Optional<List<String>> findRolesByPhoneNumber(String phoneNumber);
+
     List<User> findAllByEnabledOrderByFirstName(boolean enabled);
 
 }

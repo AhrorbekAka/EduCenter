@@ -41,4 +41,19 @@ public interface StudentHistoryRepository extends JpaRepository<StudentHistory, 
             "FROM test_result tr JOIN test t ON tr.test_id = t.id " +
             "WHERE tr.student_history_id = :studentHistoryId")
     List<ResTR> findTestResultsByStudentHistoryId(UUID studentHistoryId);
+
+//    @Query(nativeQuery = true, value = "SELECT t.title as testTitle, " +
+//            "tr.result as result, " +
+//            "tr.attempts as attempts " +
+//            "FROM test_result tr JOIN test t ON tr.test_id = t.id " +
+//            "WHERE t.id IN (SELECT tg.test_id FROM test_groups tg WHERE tg.groups_id = :groupId)")
+//    List<ResTR> findTestResultsByGroupId(UUID groupId);
+
+    @Query(nativeQuery = true, value = "SELECT t.title as testTitle, " +
+            "tr.result as result, " +
+            "tr.attempts as attempts " +
+            "FROM test_result tr JOIN (SELECT t.id, t.title FROM test t JOIN test_groups tg ON t.id = tg.test_id WHERE tg.groups_id = :groupId) t ON tr.test_id = t.id ")
+    List<ResTR> findTestResultsByGroupId(UUID groupId);
+
+
 }
