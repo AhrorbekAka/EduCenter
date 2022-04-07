@@ -167,7 +167,7 @@ public class MessageService {
                                         student.getFirstName() + "\n" +
                                         (student.getPhoneNumber() != null ? student.getPhoneNumber() + "\n" : "") +
                                         (student.getParentsNumber() != null ? student.getParentsNumber() + "\n" : "") +
-                                        (student.getAddress() != null ? student.getAddress() : "") +
+                                        (student.getAddress() != null ? student.getAddress() + "\n" : "") +
                                         (student.getBalance() != null ? student.getBalance() : ""));
                         sendMessage.setReplyMarkup(buttonService.selectedStudent());
                         break;
