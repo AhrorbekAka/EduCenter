@@ -93,7 +93,7 @@ public class ButtonService {
         for (ResStudentWithBalance student : students) {
             list = new ArrayList<>();
             btn = new InlineKeyboardButton();
-            btn.setText(String.valueOf(i)+". "+student.getLastName() + " " + student.getFirstName() + (
+            btn.setText(i+". "+student.getLastName() + " " + student.getFirstName() + (
                     student.getBalance() != null && student.getBalance() < 0 ? " \uD83D\uDD34" : " \uD83D\uDFE2"));
             btn.setCallbackData(student.getId().toString());
             list.add(btn);
@@ -122,6 +122,33 @@ public class ButtonService {
         buttonsList.add(button);
         rows1.add(buttonsList);
         inlineKeyboardMarkup.setKeyboard(rows1);
+        return inlineKeyboardMarkup;
+    }
+
+    public InlineKeyboardMarkup selectedStudent() {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> lists = new ArrayList<>();
+        List<InlineKeyboardButton> list = new ArrayList<>();
+        InlineKeyboardButton btn = new InlineKeyboardButton();
+
+        btn.setText("Tahrirlash");
+        btn.setCallbackData(Constant.EDIT.name());
+        list.add(btn);
+
+        btn = new InlineKeyboardButton();
+        btn.setText("O`chirish");
+        btn.setCallbackData(Constant.DELETE.name());
+        list.add(btn);
+        lists.add(list);
+
+        list = new ArrayList<>();
+        btn = new InlineKeyboardButton();
+        btn.setText("To`lov");
+        btn.setCallbackData(Constant.PAY.name());
+        list.add(btn);
+        lists.add(list);
+
+        inlineKeyboardMarkup.setKeyboard(lists);
         return inlineKeyboardMarkup;
     }
 
