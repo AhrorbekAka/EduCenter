@@ -21,11 +21,17 @@ public class Bot extends TelegramLongPollingBot {
     public String getBotUsername() {
         return "sevn_plus_bot";
     }
+//    public String getBotUsername() {
+//        return "TesterBootBot";
+//    }
 
     @Override
     public String getBotToken() {
         return "5205766434:AAFYGg3AhrLiuOvHuSGezNLsaavtu7Brnhw";
     }
+//    public String getBotToken() {
+//        return "1173193780:AAGIUlsOalrZ5IgfQ3eOw25Cruo9Ho6B7Nw";
+//    }
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -76,3 +82,4 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 }
+
