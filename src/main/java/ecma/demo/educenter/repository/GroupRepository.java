@@ -24,7 +24,7 @@ public interface GroupRepository extends JpaRepository<Group, UUID> {
     @Query(value = "SELECT g.* FROM groups g INNER JOIN groups_students gs on g.id = gs.groups_id AND gs.students_id = :id WHERE g.is_present = true", nativeQuery = true)
     List<Group> findAllByStudentId(UUID id);
 
-    List<Group> findAllBySubject_SubjectName(SubjectName subjectName);
+    List<Group> findAllBySubject_SubjectNameAndIsPresent(SubjectName subjectName, Boolean present);
 
     @Query(nativeQuery = true, value = "" +
             "SELECT distinct g.* " +

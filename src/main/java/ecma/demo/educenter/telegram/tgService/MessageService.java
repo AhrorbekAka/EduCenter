@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 @Service
@@ -87,6 +88,7 @@ public class MessageService {
         }
     }
 
+    @Nullable
     private User getUser(String phoneNumber) {
         try {
             return userService.getByPhoneNumber(phoneNumber);
@@ -129,6 +131,7 @@ public class MessageService {
             studentService.create(reqStudent);
         }
     }
+
 
     public SendMessage replyTo(CallbackQuery callbackQuery) {
         Long chatId = callbackQuery.getMessage().getChatId();
@@ -177,6 +180,8 @@ public class MessageService {
             } catch (IllegalArgumentException exception) {
                 exception.printStackTrace();
             }
+        } else if (data.equals(Constant.DELETE.name())){
+//            studentService.delete();
         }
         return sendMessage;
     }

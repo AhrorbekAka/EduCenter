@@ -119,7 +119,7 @@ public class GroupService implements CRUDable {
         if (user == null) {
             try {
                 if (request instanceof SubjectName) {
-                    return new ApiResponse("Success", true, groupRepository.findAllBySubject_SubjectName((SubjectName) request));
+                    return new ApiResponse("Success", true, groupRepository.findAllBySubject_SubjectNameAndIsPresent((SubjectName) request, true));
                 } else if (request instanceof String) {
                     List<Group> groupList = groupRepository.findAllByStudentPhoneNumber((String) request);
                     if (groupList.size() < 1) return new ApiResponse("No group", false);
