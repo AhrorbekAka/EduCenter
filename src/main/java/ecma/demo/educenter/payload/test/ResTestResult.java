@@ -1,4 +1,4 @@
-package ecma.demo.educenter.projections;
+package ecma.demo.educenter.payload.test;
 
 import ecma.demo.educenter.payload.test.ResTR;
 
@@ -7,5 +7,6 @@ import java.util.List;
 public interface ResTestResult {
     String getStudentLastName();
     String getStudentFirstName();
-    List<ResTR> getResTestResults();
+    int getResult();
+    int getAttempts();
 }

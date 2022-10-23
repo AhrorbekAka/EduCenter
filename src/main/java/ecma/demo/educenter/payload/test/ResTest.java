@@ -1,4 +1,4 @@
-package ecma.demo.educenter.projections;
+package ecma.demo.educenter.payload.test;
 
 import java.util.UUID;
 

@@ -2,7 +2,7 @@ package ecma.demo.educenter.repository;
 
 import ecma.demo.educenter.entity.StudentHistory;
 import ecma.demo.educenter.payload.test.ResTR;
-import ecma.demo.educenter.payload.test.ResTestResultsForAGroup;
+import ecma.demo.educenter.payload.test.ResTestResultsForTheGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,7 +26,7 @@ public interface StudentHistoryRepository extends JpaRepository<StudentHistory, 
                     "WHERE s.id in " +
                     "(SELECT students_id FROM groups_students " +
                     "WHERE groups_id = :groupId) ORDER BY s.last_name")
-    List<ResTestResultsForAGroup> findStudentHistoryIdAndNameByGroupId(UUID groupId);
+    List<ResTestResultsForTheGroup> findStudentHistoryIdAndNameByGroupId(UUID groupId);
 
     @Query(nativeQuery = true, value =
             "SELECT sh.* " +

@@ -4,6 +4,7 @@ import ecma.demo.educenter.behavior.Checkable;
 import ecma.demo.educenter.behavior.Creatable;
 import ecma.demo.educenter.behavior.Readable;
 import ecma.demo.educenter.entity.Group;
+import ecma.demo.educenter.entity.Student;
 import ecma.demo.educenter.entity.StudentHistory;
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.SubjectName;
@@ -15,7 +16,8 @@ import ecma.demo.educenter.payload.ReqIdList;
 import ecma.demo.educenter.payload.Request;
 import ecma.demo.educenter.payload.test.ReqQuestion;
 import ecma.demo.educenter.payload.test.ReqTest;
-import ecma.demo.educenter.projections.ResTest;
+import ecma.demo.educenter.payload.test.ResTest;
+import ecma.demo.educenter.payload.test.ResTestResult;
 import ecma.demo.educenter.repository.GroupRepository;
 import ecma.demo.educenter.repository.StudentHistoryRepository;
 import ecma.demo.educenter.repository.StudentRepository;
@@ -141,5 +143,10 @@ public class TestService implements Creatable, Readable, Checkable {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public ApiResponse getResultsBy(UUID testId, UUID groupId) {
+        List<ResTestResult> studentsByGroupId = testRepository.findResultsByTestIdAndGroupId(testId, groupId);
+        return new ApiResponse("Test results by test id and group id", true, studentsByGroupId);
     }
 }

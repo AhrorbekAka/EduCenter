@@ -22,10 +22,13 @@ public class TestController {
     private final Readable readable;
     private final Checkable checkable;
 
+    private final TestService testService;
+
     public TestController(TestService testService) {
         this.creatable = testService;
         this.readable = testService;
         this.checkable = testService;
+        this.testService = testService;
     }
 
     @PostMapping
@@ -41,6 +44,11 @@ public class TestController {
     @GetMapping("by-subject/{subjectName}")
     public HttpEntity<?> getTestsBySubjectName(@PathVariable SubjectName subjectName) {
         return ResponseEntity.ok(readable.read(null, subjectName));
+    }
+
+    @GetMapping("results/{testId}/{groupId}")
+    public HttpEntity<?> getTestResultsByTestIdAndGroupId(@PathVariable UUID testId, @PathVariable UUID groupId){
+        return ResponseEntity.ok(testService.getResultsBy(testId, groupId));
     }
 
     @PatchMapping("check/{studentPhoneNumber}/{testId}")

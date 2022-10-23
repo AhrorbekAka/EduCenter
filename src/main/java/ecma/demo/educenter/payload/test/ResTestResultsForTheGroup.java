@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResTestResultsForAGroup {
+public class ResTestResultsForTheGroup {
     private UUID studentHistoryId;
     private String studentLastName;
     private String studentFirstName;
