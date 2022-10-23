@@ -28,6 +28,6 @@ public interface TestRepository extends JpaRepository<Test, UUID> {
             "FROM student s " +
             "JOIN test_result tr " +
             "ON s.id = (SELECT DISTINCT sh.student_id FROM student_history sh WHERE sh.id = tr.student_history_id) " +
-            "WHERE tr.test_id=:testId AND s.id IN (SELECT students_id FROM groups_students WHERE groups_id = :groupId)")
+            "WHERE tr.test_id=:testId AND s.id IN (SELECT students_id FROM groups_students WHERE groups_id = :groupId) ORDER BY tr.result DESC")
     List<ResTestResult> findResultsByTestIdAndGroupId(UUID testId, UUID groupId);
 }
