@@ -4,7 +4,6 @@ import ecma.demo.educenter.behavior.Checkable;
 import ecma.demo.educenter.behavior.Creatable;
 import ecma.demo.educenter.behavior.Readable;
 import ecma.demo.educenter.entity.Group;
-import ecma.demo.educenter.entity.Student;
 import ecma.demo.educenter.entity.StudentHistory;
 import ecma.demo.educenter.entity.User;
 import ecma.demo.educenter.entity.enums.SubjectName;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 @Service
 public class TestService implements Creatable, Readable, Checkable {
 

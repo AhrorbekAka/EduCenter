@@ -5,12 +5,10 @@ import ecma.demo.educenter.behavior.ListCreatable;
 import ecma.demo.educenter.behavior.Readable;
 import ecma.demo.educenter.entity.Subject;
 import ecma.demo.educenter.entity.User;
-import ecma.demo.educenter.entity.attachment.ImageModel;
 import ecma.demo.educenter.entity.test.Answer;
 import ecma.demo.educenter.entity.test.Question;
 import ecma.demo.educenter.payload.ApiResponse;
 import ecma.demo.educenter.payload.Request;
-import ecma.demo.educenter.payload.test.ReqAnswer;
 import ecma.demo.educenter.payload.test.ReqQuestion;
 import ecma.demo.educenter.projections.ResAnswer;
 import ecma.demo.educenter.projections.ResQuestion;
@@ -19,8 +17,11 @@ import ecma.demo.educenter.repository.SubjectRepository;
 import ecma.demo.educenter.repository.test.AnswerRepository;
 import ecma.demo.educenter.repository.test.QuestionRepository;
 import ecma.demo.educenter.service.attachment.ImageService;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,8 +112,22 @@ public class QuestionService implements Creatable, ListCreatable, Readable {
         return resIdList;
     }
 
+    private void readWordFile() {
+        try  {
+            InputStream stream = new FileInputStream("z:\\Testlogarifm.docx");
+            Reader reader = new InputStreamReader(stream);
+            int data = reader.read();
+            while (data != -1) {
+                System.out.print((char) data);
+                data = reader.read();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public ApiResponse read(User user, Object request) {
+        readWordFile();
         if(request instanceof UUID) {
             return getTestQuestions((UUID) request);
         }
